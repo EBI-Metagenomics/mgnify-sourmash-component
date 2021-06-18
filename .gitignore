@@ -1,0 +1,15 @@
+dist/
+node_modules/
+
+
+# IDE (Webstorm) files
+*.iml
+*.idea
+.vscode
+
+# MacOS specific
+.DS_STORE
+
+# Coverage tmp files
+coverage
+coverage.lcov
