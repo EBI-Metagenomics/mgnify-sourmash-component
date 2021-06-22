@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -36,5 +37,14 @@ module.exports = {
       template: path.resolve(__dirname, 'public', 'index.html'),
       title: 'MGnify Sourmash Component - EBI',
     }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+      process: 'process/browser',
+      util: 'util',
+      stream: 'stream',
+    }),
   ],
+  experiments: {
+    syncWebAssembly: true,
+  },
 };
