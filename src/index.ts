@@ -1,6 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import skecthFiles from './sketcher';
+
+import Worker from 'worker-loader!./sketcher.worker.ts';
+
+const worker = new Worker();
 
 @customElement('mgnify-sourmash-component')
 class MGnifySourmash extends LitElement {
@@ -8,6 +11,30 @@ class MGnifySourmash extends LitElement {
   directory = false;
 
   selectedFiles: Array<File> = null;
+  progress: {
+    [filename: string]: number;
+  } = {};
+  signatures: {
+    [filename: string]: string;
+  } = {};
+
+  constructor() {
+    super();
+    worker.addEventListener('message', (event) => {
+      switch (event?.data?.type) {
+        case 'progress:read':
+          this.progress[event.data.filename] = event.data.progress;
+          this.requestUpdate();
+          break;
+        case 'signature:generated':
+          this.signatures[event.data.filename] = event.data.signature;
+          this.requestUpdate();
+          break;
+        default:
+          break;
+      }
+    });
+  }
 
   setChecked(event: MouseEvent) {
     this.directory = (event.target as HTMLInputElement).checked;
@@ -28,12 +55,21 @@ class MGnifySourmash extends LitElement {
             <h2>Selected Files</h2>
             <ul>
               ${this.selectedFiles.map((file: File) => {
-                const progress = (file as any).progress?.read || 0.0;
+                const progress = this.progress[file.name];
+                const signature = this.signatures[file.name];
                 return html` <li>
                   ${file.name}
                   <progress id=${file.name} max="100" value=${progress}>
                     ${progress.toFixed(2)}%
                   </progress>
+                  ${signature?.length
+                    ? html`
+                        <details>
+                          <summary>See signature</summary>
+                          <pre>${signature}</pre>
+                        </details>
+                      `
+                    : ''}
                 </li>`;
               })}
             </ul>
@@ -79,7 +115,9 @@ class MGnifySourmash extends LitElement {
         file.name.endsWith('.fasta') ||
         file.name.endsWith('.fasta.gz')
     );
-    skecthFiles(this.selectedFiles, () => this.requestUpdate());
+
+    worker.postMessage({ files: this.selectedFiles });
+
     this.requestUpdate();
   }
 }

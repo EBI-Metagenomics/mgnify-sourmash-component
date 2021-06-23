@@ -19,7 +19,7 @@ declare module 'through2' {
   export default x;
 }
 declare module 'peek-stream' {
-  const x: (f: (data: any, swap: any)=>any )=>any;
+  const x: (f: (data: any, swap: any) => any) => any;
   export default x;
 }
 
@@ -38,4 +38,15 @@ declare module 'fasta-parser' {
 declare module 'sourmash/sourmash_bg.wasm' {
   const x: any;
   export default x;
+}
+
+declare module 'worker-loader!*' {
+  // You need to change `Worker`, if you specified a different value for the `workerType` option
+  class WebpackWorker extends Worker {
+    constructor();
+  }
+
+  // Uncomment this if you set the `esModule` option to `false`
+  // export = WebpackWorker;
+  export default WebpackWorker;
 }

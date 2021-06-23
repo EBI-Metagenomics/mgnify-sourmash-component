@@ -1,3 +1,5 @@
+const ctx: Worker = self as any;
+
 // import * as Sourmash from 'sourmash';
 
 import { read as FileReadStream } from 'filestream';
@@ -57,24 +59,24 @@ function FASTParser() {
   });
 }
 
-function skecthFiles(files: File[], refresh: () => void) {
+function skecthFiles(files: File[]) {
   for (let file of files) {
-    skecthFile(file, refresh);
+    skecthFile(file);
   }
 }
-async function skecthFile(file: File, refresh: () => void) {
+async function skecthFile(file: File) {
   const reader = new FileReadStream(file);
 
   const fileSize = file.size;
-  (file as any).progress = {
-    read: 0,
-  };
 
   let loadedFile = 0;
   (reader.reader as any).addEventListener('progress', (data: any) => {
     loadedFile += data.loaded;
-    (file as any).progress.read = (loadedFile / fileSize) * 100;
-    refresh();
+    ctx.postMessage({
+      type: 'progress:read',
+      filename: file.name,
+      progress: (loadedFile / fileSize) * 100,
+    });
   });
 
   const num = 0;
@@ -100,12 +102,16 @@ async function skecthFile(file: File, refresh: () => void) {
 
   seqparser
     .on('data', function (data: any) {
-      // console.log(data.seq)
       mh.add_sequence_js(data.seq);
     })
     .on('end', function () {
-      console.log('end');
       const jsonStr = mh.to_json();
+      ctx.postMessage({
+        type: 'signature:generated',
+        filename: file.name,
+        signature: jsonStr,
+      });
+
       const jsonData = JSON.parse(jsonStr);
       console.log(jsonData, jsonStr.length, fileSize);
 
@@ -127,3 +133,10 @@ async function skecthFile(file: File, refresh: () => void) {
 }
 
 export default skecthFiles;
+
+// Respond to message from parent thread
+ctx.addEventListener('message', (event) => {
+  if (event?.data?.files?.length) {
+    skecthFiles(event.data.files);
+  }
+});

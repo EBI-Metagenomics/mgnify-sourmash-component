@@ -51,6 +51,7 @@
     "sourmash": "0.6.0",
     "stream": "0.0.2",
     "through2": "4.0.2",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+    "worker-loader": "3.0.8"
   }
 }
