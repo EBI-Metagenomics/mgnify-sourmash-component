@@ -11,6 +11,17 @@ interface Read {
   pipe: (f: () => any) => any;
 }
 
+interface KmerMinHashOptions {
+  num: number,
+  ksize: number,
+  is_protein: boolean,
+  dayhoff: boolean,
+  hp: boolean,
+  seed: number,
+  scaled: number,
+  track_abundance: boolean,
+}
+
 declare module 'filestream' {
   export const read: Read;
 }

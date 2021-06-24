@@ -7,8 +7,31 @@ const worker = new Worker();
 
 @customElement('mgnify-sourmash-component')
 class MGnifySourmash extends LitElement {
+  @property({ type: Boolean, reflect: true })
+  directory: boolean = false;
   @property({ type: Boolean })
-  directory = false;
+  show_directory_checkbox: boolean = false;
+  @property({ type: Boolean })
+  show_signatures: boolean = false;
+
+  // KmerMinHash parameters
+  @property({ type: Number }) 
+  num: number = 0;
+  @property({ type: Number }) 
+  ksize: number = 31;
+  @property({ type: Boolean }) 
+  is_protein: boolean = false;
+  @property({ type: Boolean }) 
+  dayhoff: boolean = false;
+  @property({ type: Boolean }) 
+  hp: boolean = false;
+  @property({ type: Number }) 
+  seed: number = 42;
+  @property({ type: Number }) 
+  scaled: number = 1000;
+  @property({ type: Boolean }) 
+  track_abundance: boolean = false;
+
 
   selectedFiles: Array<File> = null;
   progress: {
@@ -62,7 +85,7 @@ class MGnifySourmash extends LitElement {
                   <progress id=${file.name} max="100" value=${progress}>
                     ${progress.toFixed(2)}%
                   </progress>
-                  ${signature?.length
+                  ${this.show_signatures && signature?.length
                     ? html`
                         <details>
                           <summary>See signature</summary>
@@ -91,6 +114,7 @@ class MGnifySourmash extends LitElement {
           ?webkitdirectory=${this.directory}
           ?multiple=${!this.directory}
         />
+        ${this.show_directory_checkbox ? html`
         <label>
           <input
             type="checkbox"
@@ -99,6 +123,8 @@ class MGnifySourmash extends LitElement {
           />
           Select a directory
         </label>
+        ` :''
+        }
         ${this.renderSelectedFiles()}
       </div>
     `;
@@ -116,7 +142,16 @@ class MGnifySourmash extends LitElement {
         file.name.endsWith('.fasta.gz')
     );
 
-    worker.postMessage({ files: this.selectedFiles });
+    worker.postMessage({ files: this.selectedFiles , options: {
+      num: this.num,
+      ksize: this.ksize,
+      is_protein: this.is_protein,
+      dayhoff: this.dayhoff,
+      hp: this.hp,
+      seed: this.seed,
+      scaled: this.scaled,
+      track_abundance: this.track_abundance,
+    }});
 
     this.requestUpdate();
   }

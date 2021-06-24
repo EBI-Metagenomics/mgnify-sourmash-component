@@ -42,12 +42,12 @@ function FASTParser() {
   });
 }
 
-function skecthFiles(files: File[]) {
+function skecthFiles(files: File[], options: KmerMinHashOptions) {
   for (let file of files) {
-    skecthFile(file);
+    skecthFile(file, options);
   }
 }
-async function skecthFile(file: File) {
+async function skecthFile(file: File, options: KmerMinHashOptions) {
   const reader = new FileReadStream(file);
 
   const fileSize = file.size;
@@ -62,23 +62,17 @@ async function skecthFile(file: File) {
     });
   });
 
-  const num = 0;
-  const ksize = 31;
-  const isProtein = false;
-  const scaled = 1000;
-  const trackAbundance = false;
-
   await Promise.all([smImport]);
-
+  console.log(options);
   const mh = new KmerMinHash(
-    num,
-    ksize,
-    isProtein,
-    false,
-    false,
-    42,
-    scaled,
-    trackAbundance
+    options.num,
+    options.ksize,
+    options.is_protein,
+    options.dayhoff,
+    options.hp,
+    options.seed,
+    options.scaled,
+    options.track_abundance,
   );
   const seqparser = FASTParser();
 
@@ -102,6 +96,6 @@ export default skecthFiles;
 // Respond to message from parent thread
 ctx.addEventListener('message', (event) => {
   if (event?.data?.files?.length) {
-    skecthFiles(event.data.files);
+    skecthFiles(event.data.files, event.data.options);
   }
 });
