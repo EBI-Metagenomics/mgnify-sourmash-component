@@ -1,19 +1,15 @@
 const ctx: Worker = self as any;
 
-// import * as Sourmash from 'sourmash';
 
 import { read as FileReadStream } from 'filestream';
-// TODO: Replace filestream for the streams API once pipeThrough is stable
-// https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
-
-// import { FASTQStream } from 'fastqstream';
+// TODO: To be replaced by parsing the fasta from inside sourmash
 import Fasta from 'fasta-parser';
 
-// const zlib = require('zlib');
 import peek from 'peek-stream';
 import through from 'through2';
-import pumpify from 'pumpify';
+import {obj as Pumpify} from 'pumpify';
 
+// This needs to be a dynamic import to be able to use the wasm from inside sourmash
 let KmerMinHash: any = null;
 const smImport = import('sourmash').then(
   (Sourmash) => (KmerMinHash = Sourmash.KmerMinHash)
@@ -22,17 +18,7 @@ const smImport = import('sourmash').then(
 const isFASTA = (data: Uint8Array | Uint16Array | Uint32Array) =>
   data.toString().charAt(0) === '>';
 
-// const isFASTQ = (data) => data.toString().charAt(0) === '@';
 
-const isGzip = (data: Uint8Array | Uint16Array | Uint32Array) =>
-  data[0] === 31 && data[1] === 139;
-
-// function GzipParser() {
-//   return peek(function (data: any, swap: any) {
-//     if (isGzip(data)) return swap(null, new zlib.Unzip());
-//     else return swap(null, through());
-//   });
-// }
 function jsParse() {
   function transform(obj: any, enc: any, next: () => void) {
     let newObj: string = obj;
@@ -51,10 +37,7 @@ function jsParse() {
 
 function FASTParser() {
   return peek(function (data: any, swap: any) {
-    if (isFASTA(data)) return swap(null, pumpify.obj(Fasta(), jsParse()));
-    // if (isFASTQ(data)) return swap(null, new FASTQStream());
-
-    // we do not know - bail
+    if (isFASTA(data)) return swap(null, new Pumpify(Fasta(), jsParse()));
     swap(new Error('No parser available'));
   });
 }
@@ -98,7 +81,6 @@ async function skecthFile(file: File) {
     trackAbundance
   );
   const seqparser = FASTParser();
-  // const compressedparser = new GzipParser();
 
   seqparser
     .on('data', function (data: any) {
@@ -111,24 +93,7 @@ async function skecthFile(file: File) {
         filename: file.name,
         signature: jsonStr,
       });
-
-      const jsonData = JSON.parse(jsonStr);
-      console.log(jsonData, jsonStr.length, fileSize);
-
-      //     const file = new window.Blob([jsonData], {
-      //       type: 'application/octet-binary',
-      //     });
-      //     const url = window.URL.createObjectURL(file);
     });
-
-  // switch (file.type) {
-  //   case 'application/gzip':
-  //     reader.pipe(new zlib.Unzip()).pipe(seqparser);
-  //     break;
-  //   default:
-  //     reader.pipe(compressedparser).pipe(seqparser);
-  //     break;
-  // }
   reader.pipe(seqparser);
 }
 

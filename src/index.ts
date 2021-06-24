@@ -55,7 +55,7 @@ class MGnifySourmash extends LitElement {
             <h2>Selected Files</h2>
             <ul>
               ${this.selectedFiles.map((file: File) => {
-                const progress = this.progress[file.name];
+                const progress = this.progress?.[file.name] || 0;
                 const signature = this.signatures[file.name];
                 return html` <li>
                   ${file.name}
