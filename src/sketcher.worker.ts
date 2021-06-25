@@ -63,7 +63,6 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
   });
 
   await Promise.all([smImport]);
-  console.log(options);
   const mh = new KmerMinHash(
     options.num,
     options.ksize,

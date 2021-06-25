@@ -4,8 +4,29 @@ A web component that let you select FastA or FastQ sequence files and creates sk
 
 ## Usage
 
+You can add the following inn your HTML:
+
 ```html
-<mgnify-sourmash-component ksize="31" scaled="1000" />
+<mgnify-sourmash-component id="sourmash" ksize="31" scaled="1000" />
+```
+
+And use it via events in your javascript:
+
+```javascript
+document
+  .getElementById('sourmash')
+  .addEventListener('load', (evt) =>
+    console.log(`The signature for ${evt.detail.filename} has been created`)
+  );
+document
+  .getElementById('sourmash')
+  .addEventListener('loadend', (evt) =>
+    console.log(
+      `Processing of all these files have finished: ${Object.keys(
+        evt.detail.signatures
+      )}`
+    )
+  );
 ```
 
 ## API reference
@@ -62,6 +83,50 @@ Create abundance-weighted (or not) sketches.
 
 ### Properties
 
+##### `selectedFiles: Array<File> = null`
+
+The `selectedFiles` property holds the array of files that are or have been processed by this component.
+
+##### `progress: {[filename: string]: number}`
+
+The `progress` property is an object where the key are the filenames of the selected files and the value is a float from `0` to `100` reporting how much of the file has been read and processed.
+
+##### `signatures: {[filename: string]: string};
+
+The `signatures` property is an object where the key are the filenames of the selected files and the value is the calculated signature as a `string` in JSON format. If a filename is not in this object, means that the signature has not yet been calculated, you can check the `progress` property to see how far it has been read.
+
 ### Methods
 
 ### Events
+
+##### `load`
+
+The `load` event is fired when a single file read is completed and a signature for has been calculated.
+
+| Bubbles    | Yes |
+| ---------- | --- |
+| Cancelable | No  |
+
+```typescript
+detail: {
+  filename: string,
+  signature: string, //it is given as a string but it is in JSON format, so you could safely use JSON.parse
+}
+```
+
+##### `loadend`
+
+The `loadend` event is fired when all the requested files have been read and proccessed.
+If a signature couldn't be generated, its value in the returned object will be `null`.
+
+| Bubbles    | Yes |
+| ---------- | --- |
+| Cancelable | No  |
+
+```typescript
+detail: {
+  signatures: {
+    [filename: string]: string;
+  };
+}
+```

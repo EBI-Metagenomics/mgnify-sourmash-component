@@ -51,12 +51,37 @@ class MGnifySourmash extends LitElement {
           break;
         case 'signature:generated':
           this.signatures[event.data.filename] = event.data.signature;
+          this.dispatchEvent(
+            new CustomEvent("load", {
+              bubbles: true,
+              detail: {
+                filename: event.data.filename,
+                signature: event.data.signature,
+              }
+            })
+          );
+          if (this.haveCompletedAllSignatures()){
+            this.dispatchEvent(
+              new CustomEvent("loadend", {
+                bubbles: true,
+                detail: {
+                  signatures: this.signatures,
+                }
+              })
+            );  
+          }
           this.requestUpdate();
           break;
         default:
           break;
       }
     });
+  }
+
+  private haveCompletedAllSignatures(){
+    return Object.keys(this.progress).every(
+      (key: string) => key in this.signatures
+    )
   }
 
   setChecked(event: MouseEvent) {
