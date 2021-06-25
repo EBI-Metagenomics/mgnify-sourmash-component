@@ -13,10 +13,10 @@ jobs:
           npm ci
       - name: Test 🧪
         run: |
-          npm eslint
+          npm run eslint
       - name: Build Component 🏗
         run: |
-          npm build
+          npm run build
           ls -l dist
       - name: Deploy Site 🚀
         if: github.ref == 'refs/heads/master'
