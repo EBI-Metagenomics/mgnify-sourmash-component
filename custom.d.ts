@@ -12,21 +12,25 @@ interface Read {
 }
 
 interface KmerMinHashOptions {
-  num: number,
-  ksize: number,
-  is_protein: boolean,
-  dayhoff: boolean,
-  hp: boolean,
-  seed: number,
-  scaled: number,
-  track_abundance: boolean,
+  num: number;
+  ksize: number;
+  is_protein: boolean;
+  dayhoff: boolean;
+  hp: boolean;
+  seed: number;
+  scaled: number;
+  track_abundance: boolean;
 }
+
+type DataChunk = Uint8Array | Uint16Array | Uint32Array;
 
 declare module 'filestream' {
   export const read: Read;
 }
+
+type SwapFuntion = (_: any, x?: any) => any;
 declare module 'peek-stream' {
-  const x: (f: (data: any, swap: any) => any) => any;
+  const x: (f: (data: any, swap: SwapFuntion) => any) => any;
   export default x;
 }
 

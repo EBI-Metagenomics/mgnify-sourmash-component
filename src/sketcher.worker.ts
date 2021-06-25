@@ -1,5 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ctx: Worker = self as any;
-
 
 import { read as FileReadStream } from 'filestream';
 // TODO: To be replaced by parsing the fasta from inside sourmash
@@ -7,24 +7,21 @@ import Fasta from 'fasta-parser';
 
 import peek from 'peek-stream';
 import through from 'through2';
-import {obj as Pumpify} from 'pumpify';
+import { obj as Pumpify } from 'pumpify';
+import { KmerMinHash as KmerMinHashType } from 'sourmash';
 
 // This needs to be a dynamic import to be able to use the wasm from inside sourmash
-let KmerMinHash: any = null;
+let KmerMinHash: typeof KmerMinHashType = null;
 const smImport = import('sourmash').then(
   (Sourmash) => (KmerMinHash = Sourmash.KmerMinHash)
 );
 
-const isFASTA = (data: Uint8Array | Uint16Array | Uint32Array) =>
-  data.toString().charAt(0) === '>';
-
+const isFASTA = (data: DataChunk) => data.toString().charAt(0) === '>';
 
 function jsParse() {
-  function transform(obj: any, enc: any, next: () => void) {
-    let newObj: string = obj;
-    if (Buffer.isBuffer(obj)) {
-      newObj = obj.toString();
-    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transform(obj: string | Buffer, _: any, next: () => void) {
+    const newObj = Buffer.isBuffer(obj) ? obj.toString() : obj;
     this.push(JSON.parse(newObj));
     next();
   }
@@ -36,14 +33,14 @@ function jsParse() {
 }
 
 function FASTParser() {
-  return peek(function (data: any, swap: any) {
+  return peek(function (data: DataChunk, swap: SwapFuntion) {
     if (isFASTA(data)) return swap(null, new Pumpify(Fasta(), jsParse()));
     swap(new Error('No parser available'));
   });
 }
 
 function skecthFiles(files: File[], options: KmerMinHashOptions) {
-  for (let file of files) {
+  for (const file of files) {
     skecthFile(file, options);
   }
 }
@@ -53,14 +50,17 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
   const fileSize = file.size;
 
   let loadedFile = 0;
-  (reader.reader as any).addEventListener('progress', (data: any) => {
-    loadedFile += data.loaded;
-    ctx.postMessage({
-      type: 'progress:read',
-      filename: file.name,
-      progress: (loadedFile / fileSize) * 100,
-    });
-  });
+  (reader.reader as FileReader).addEventListener(
+    'progress',
+    (data: ProgressEvent) => {
+      loadedFile += data.loaded;
+      ctx.postMessage({
+        type: 'progress:read',
+        filename: file.name,
+        progress: (loadedFile / fileSize) * 100,
+      });
+    }
+  );
 
   await Promise.all([smImport]);
   const mh = new KmerMinHash(
@@ -71,12 +71,12 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
     options.hp,
     options.seed,
     options.scaled,
-    options.track_abundance,
+    options.track_abundance
   );
   const seqparser = FASTParser();
 
   seqparser
-    .on('data', function (data: any) {
+    .on('data', function (data: { seq: string }) {
       mh.add_sequence_js(data.seq);
     })
     .on('end', function () {
