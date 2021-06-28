@@ -50,8 +50,9 @@ export class MGnifySourmash extends LitElement {
           break;
         case 'signature:generated':
           this.signatures[event.data.filename] = event.data.signature;
+          this.progress[event.data.filename] = 100;
           this.dispatchEvent(
-            new CustomEvent('load', {
+            new CustomEvent('sketched', {
               bubbles: true,
               detail: {
                 filename: event.data.filename,
@@ -61,7 +62,7 @@ export class MGnifySourmash extends LitElement {
           );
           if (this.haveCompletedAllSignatures()) {
             this.dispatchEvent(
-              new CustomEvent('loadend', {
+              new CustomEvent('sketchedall', {
                 bubbles: true,
                 detail: {
                   signatures: this.signatures,

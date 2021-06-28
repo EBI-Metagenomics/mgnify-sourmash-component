@@ -19,12 +19,12 @@ And use it via events in your javascript:
 ```javascript
 document
   .getElementById('sourmash')
-  .addEventListener('load', (evt) =>
+  .addEventListener('sketched', (evt) =>
     console.log(`The signature for ${evt.detail.filename} has been created`)
   );
 document
   .getElementById('sourmash')
-  .addEventListener('loadend', (evt) =>
+  .addEventListener('sketchedall', (evt) =>
     console.log(
       `Processing of all these files have finished: ${Object.keys(
         evt.detail.signatures
@@ -103,9 +103,9 @@ The `signatures` property is an object where the key are the filenames of the se
 
 ### Events
 
-##### `load`
+##### `sketched`
 
-The `load` event is fired when a single file read is completed and a signature for has been calculated.
+The `sketched` event is fired when a single file read is completed and a signature for has been calculated.
 
 | Bubbles    | Yes |
 | ---------- | --- |
@@ -118,9 +118,9 @@ detail: {
 }
 ```
 
-##### `loadend`
+##### `sketchedall`
 
-The `loadend` event is fired when all the requested files have been read and proccessed.
+The `sketchedall` event is fired when all the requested files have been read and proccessed.
 If a signature couldn't be generated, its value in the returned object will be `null`.
 
 | Bubbles    | Yes |

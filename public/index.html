@@ -15,14 +15,14 @@
     <script>
       document
         .getElementById('sourmash')
-        .addEventListener('load', (evt) =>
+        .addEventListener('sketched', (evt) =>
           console.log(
             `The signature for ${evt.detail.filename} has been created`
           )
         );
       document
         .getElementById('sourmash')
-        .addEventListener('loadend', (evt) =>
+        .addEventListener('sketchedall', (evt) =>
           console.log(
             `Processing of all these files have finished: ${Object.keys(
               evt.detail.signatures
