@@ -1,6 +1,6 @@
 {
   "name": "mgnify-sourmash-component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A web component to select FastA file and generate sourmash signatures locally.",
   "main": "dist/mgnify-sourmash-component.js",
   "module": "src/index.ts",
