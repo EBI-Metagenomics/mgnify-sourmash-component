@@ -5,7 +5,7 @@ const webpack = require('webpack');
 module.exports = {
   mode: 'development',
   entry: './src/index.ts',
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     port: 9001,
@@ -13,6 +13,10 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.worker\.ts$/,
+        loader: 'worker-loader',
+      },
       {
         test: /\.tsx?$/,
         use: 'ts-loader',

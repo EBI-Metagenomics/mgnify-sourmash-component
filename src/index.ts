@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import Worker from 'worker-loader!./sketcher.worker.ts';
+import Worker from './sketcher.worker.ts';
 
 const worker = new Worker();
 
