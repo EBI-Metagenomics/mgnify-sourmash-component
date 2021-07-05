@@ -4,6 +4,15 @@ declare module '*.css' {
   export default content;
 }
 
+interface Read {
+  // eslint-disable-next-line  @typescript-eslint/no-misused-new
+  new (file: File): Read;
+  reader: {
+    onprogress: (data: any) => void;
+  };
+  pipe: (f: () => any) => any;
+}
+
 interface KmerMinHashOptions {
   num: number;
   ksize: number;
@@ -18,13 +27,6 @@ interface KmerMinHashOptions {
 type DataChunk = Uint8Array | Uint16Array | Uint32Array;
 
 declare module 'filestream' {
-  class Read {
-    constructor(file: File);
-    reader: {
-      onprogress: (data: any) => void;
-    };
-    pipe: (f: () => any) => any;
-  }
   export const read: Read;
 }
 
