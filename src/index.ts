@@ -188,6 +188,6 @@ export class MGnifySourmash extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "mgnify-sourmash-component": MGnifySourmash,
+    'mgnify-sourmash-component': MGnifySourmash;
   }
 }
