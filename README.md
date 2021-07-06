@@ -2,7 +2,7 @@
 
 [![Test and Publish the Demo](https://github.com/EBI-Metagenomics/mgnify-sourmash-component/actions/workflows/test-and-publish-demo.yml/badge.svg)](https://github.com/EBI-Metagenomics/mgnify-sourmash-component/actions/workflows/test-and-publish-demo.yml)
 
-A web component that let you select FastA or FastQ sequence files and creates sketches (KmerMinHash signatures) using [Sourmash](https://sourmash.readthedocs.io/).
+A web component that let you select FastA sequence files and creates sketches (KmerMinHash signatures) using [Sourmash](https://sourmash.readthedocs.io/).
 
 The demo in GH pages can be seen [HERE](https://ebi-metagenomics.github.io/mgnify-sourmash-component/).
 

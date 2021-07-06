@@ -5,6 +5,7 @@ import Worker from './sketcher.worker.ts';
 
 const worker = new Worker();
 
+const SUPPORTED_EXTENSIONS = ['.fa', '.fasta'];
 @customElement('mgnify-sourmash-component')
 export class MGnifySourmash extends LitElement {
   @property({ type: Boolean, reflect: true })
@@ -127,14 +128,12 @@ export class MGnifySourmash extends LitElement {
   render() {
     return html`
       <div class="mgnify-sourmash-component">
-        <label for="sourmash-selector"
-          >Select the FastA files (gzip supported) :</label
-        >
+        <label for="sourmash-selector">Select FastA files:</label>
         <input
           type="file"
           id="sourmash-selector"
           name="sourmash-selector"
-          accept=".fa,.gz,.fasta"
+          accept=${SUPPORTED_EXTENSIONS.join(',')}
           @change=${this.handleFileChanges}
           ?webkitdirectory=${this.directory}
           ?multiple=${!this.directory}
@@ -160,13 +159,14 @@ export class MGnifySourmash extends LitElement {
     event.preventDefault();
     this.selectedFiles = Array.from(
       (event.currentTarget as HTMLInputElement).files
-    ).filter(
-      (file: File) =>
-        file.name.endsWith('.fa') ||
-        file.name.endsWith('.fa.gz') ||
-        file.name.endsWith('.fasta') ||
-        file.name.endsWith('.fasta.gz')
-    );
+    ).filter((file: File) => {
+      for (const ext of SUPPORTED_EXTENSIONS) {
+        if (file.name.endsWith(ext)) {
+          return true;
+        }
+      }
+      return false;
+    });
 
     worker.postMessage({
       files: this.selectedFiles,
