@@ -8,6 +8,7 @@
   "scripts": {
     "build": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
+    "watch": "webpack --mode=development --watch",
     "start": "webpack serve",
     "eslint": "eslint src/*",
     "eslint:fix": "eslint src/* --fix",
