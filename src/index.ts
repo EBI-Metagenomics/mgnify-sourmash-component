@@ -88,6 +88,15 @@ export class MGnifySourmash extends LitElement {
   setChecked(event: MouseEvent) {
     this.directory = (event.target as HTMLInputElement).checked;
   }
+
+  clear(){
+    this.selectedFiles=null;
+    this.progress = {};
+    this.signatures= {};
+    (this.renderRoot.querySelector('#sourmash-selector') as HTMLInputElement).value = null;
+    this.requestUpdate();
+  }
+
   static get styles() {
     return css`
       .mgnify-sourmash-component {
@@ -181,6 +190,14 @@ export class MGnifySourmash extends LitElement {
         track_abundance: this.track_abundance,
       },
     });
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        bubbles: true,
+        detail: {
+          selectedFiles: this.selectedFiles,
+        },
+      })
+    );
 
     this.requestUpdate();
   }
