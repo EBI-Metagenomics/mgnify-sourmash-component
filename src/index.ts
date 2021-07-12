@@ -89,11 +89,13 @@ export class MGnifySourmash extends LitElement {
     this.directory = (event.target as HTMLInputElement).checked;
   }
 
-  clear(){
-    this.selectedFiles=null;
+  clear() {
+    this.selectedFiles = null;
     this.progress = {};
-    this.signatures= {};
-    (this.renderRoot.querySelector('#sourmash-selector') as HTMLInputElement).value = null;
+    this.signatures = {};
+    (
+      this.renderRoot.querySelector('#sourmash-selector') as HTMLInputElement
+    ).value = null;
     this.requestUpdate();
   }
 
