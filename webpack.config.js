@@ -24,7 +24,10 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        loader: 'lit-css-loader',
+        options: {
+          import: 'lit', // defaults to lit-element
+        },
       },
     ],
   },

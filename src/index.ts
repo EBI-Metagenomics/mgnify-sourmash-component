@@ -1,7 +1,9 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import Worker from './sketcher.worker.ts';
+
+import style from './index.css';
 
 const worker = new Worker();
 
@@ -40,6 +42,11 @@ export class MGnifySourmash extends LitElement {
   signatures: {
     [filename: string]: string;
   } = {};
+  errors: {
+    [filename: string]: string;
+  } = {};
+
+  static styles = [style];
 
   constructor() {
     super();
@@ -47,6 +54,19 @@ export class MGnifySourmash extends LitElement {
       switch (event?.data?.type) {
         case 'progress:read':
           this.progress[event.data.filename] = event.data.progress;
+          this.requestUpdate();
+          break;
+        case 'signature:error':
+          this.errors[event.data.filename] = event.data.error;
+          this.dispatchEvent(
+            new CustomEvent('sketchedError', {
+              bubbles: true,
+              detail: {
+                filename: event.data.filename,
+                error: event.data.error,
+              },
+            })
+          );
           this.requestUpdate();
           break;
         case 'signature:generated':
@@ -67,6 +87,7 @@ export class MGnifySourmash extends LitElement {
                 bubbles: true,
                 detail: {
                   signatures: this.signatures,
+                  errors: this.errors,
                 },
               })
             );
@@ -81,7 +102,7 @@ export class MGnifySourmash extends LitElement {
 
   private haveCompletedAllSignatures() {
     return Object.keys(this.progress).every(
-      (key: string) => key in this.signatures
+      (key: string) => key in this.signatures || key in this.errors
     );
   }
 
@@ -93,72 +114,80 @@ export class MGnifySourmash extends LitElement {
     this.selectedFiles = null;
     this.progress = {};
     this.signatures = {};
+    this.errors = {};
     (
       this.renderRoot.querySelector('#sourmash-selector') as HTMLInputElement
     ).value = null;
     this.requestUpdate();
   }
 
-  static get styles() {
-    return css`
-      .mgnify-sourmash-component {
-        display: flex;
-        flex-direction: column;
-      }
+  renderSelectedFiles() {
+    if ((this.selectedFiles?.length || 0) < 1) return '';
+    return html`
+      <div>
+        <h2>Selected Files</h2>
+        <ul>
+          ${this.selectedFiles.map((file: File) => {
+            const progress = this.progress?.[file.name] || 0;
+            const signature = this.signatures[file.name];
+            const error = this.errors[file.name];
+            let emoji = html``;
+            if (signature) emoji = html`✅`;
+            if (error) emoji = html`<span title=${error}>⚠️</span>`;
+            return html` <li>
+              ${emoji} ${file.name}
+              <progress id=${file.name} max="100" value=${progress}>
+                ${progress.toFixed(2)}%
+              </progress>
+              ${this.show_signatures && signature?.length
+                ? html`
+                    <details>
+                      <summary>See signature</summary>
+                      <pre>${signature}</pre>
+                    </details>
+                  `
+                : ''}
+            </li>`;
+          })}
+        </ul>
+      </div>
     `;
   }
-  renderSelectedFiles() {
-    return (this.selectedFiles?.length || 0) < 1
-      ? ''
-      : html`
-          <div>
-            <h2>Selected Files</h2>
-            <ul>
-              ${this.selectedFiles.map((file: File) => {
-                const progress = this.progress?.[file.name] || 0;
-                const signature = this.signatures[file.name];
-                return html` <li>
-                  ${file.name}
-                  <progress id=${file.name} max="100" value=${progress}>
-                    ${progress.toFixed(2)}%
-                  </progress>
-                  ${this.show_signatures && signature?.length
-                    ? html`
-                        <details>
-                          <summary>See signature</summary>
-                          <pre>${signature}</pre>
-                        </details>
-                      `
-                    : ''}
-                </li>`;
-              })}
-            </ul>
-          </div>
-        `;
-  }
   render() {
+    let label = this.directory ? 'Choose a directory...' : 'Choose Files...';
+    if (this.selectedFiles?.length)
+      label = `${this.selectedFiles?.length} Files Selected`;
     return html`
       <div class="mgnify-sourmash-component">
-        <label for="sourmash-selector">Select FastA files:</label>
-        <input
-          type="file"
-          id="sourmash-selector"
-          name="sourmash-selector"
-          accept=${SUPPORTED_EXTENSIONS.join(',')}
-          @change=${this.handleFileChanges}
-          ?webkitdirectory=${this.directory}
-          ?multiple=${!this.directory}
-        />
+        <label>Select the FastA files:</label>
+        <label class="file" for="sourmash-selector">
+          <input
+            type="file"
+            id="sourmash-selector"
+            name="sourmash-selector"
+            accept=${SUPPORTED_EXTENSIONS.join(',')}
+            @change=${this.handleFileChanges}
+            ?webkitdirectory=${this.directory}
+            ?multiple=${!this.directory}
+          />
+          <span class="file-custom" data-label=${label}></span>
+        </label>
         ${this.show_directory_checkbox
           ? html`
-              <label>
-                <input
-                  type="checkbox"
-                  @change=${this.setChecked}
-                  ?checked=${this.directory}
-                />
-                Select a directory
-              </label>
+              <div class="mode-selector">
+                <button
+                  class=${this.directory ? '' : 'selected'}
+                  @click=${() => (this.directory = false)}
+                >
+                  Files
+                </button>
+                <button
+                  class=${this.directory ? 'selected' : ''}
+                  @click=${() => (this.directory = true)}
+                >
+                  Directory
+                </button>
+              </div>
             `
           : ''}
         ${this.renderSelectedFiles()}

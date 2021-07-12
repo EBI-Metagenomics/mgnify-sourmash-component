@@ -1,0 +1,76 @@
+.mgnify-sourmash-component {
+  display: flex;
+  flex-direction: column;
+  font-family: Helvetica, Arial, FreeSans, Liberation Sans, sans-serif;
+}
+label.file {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  height: 2.5rem;
+  box-sizing: border-box;
+  color: #5a5a5a;
+  border: 0.075rem solid #ddd;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+.file-custom:after {
+  content: attr(data-label);
+  position: absolute;
+  inset: -0.075rem -0.075rem -0.075rem 0px;
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+}
+.file-custom:before {
+  position: absolute;
+  top: -0.075rem;
+  right: -0.075rem;
+  bottom: -0.075rem;
+  z-index: 6;
+  display: block;
+  content: 'Browse';
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+  color: #555;
+  background-color: #eee;
+  border: 0.075rem solid #ddd;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+input[type='file'] {
+  min-width: 14rem;
+  margin: 0;
+  opacity: 0;
+}
+div.mode-selector {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 0.4em;
+}
+div.mode-selector button {
+  background-color: #eee;
+  color: #555;
+  padding: 0.5em;
+  margin: 0;
+  appearance: none;
+  border: 0;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+div.mode-selector button:nth-child(even) {
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+div.mode-selector button.selected {
+  background-color: #444;
+  color: #fefefe;
+  font-weight: bold;
+}
+
+.mgnify-sourmash-component ul {
+  list-style-type: none;
+}
+.mgnify-sourmash-component ul li {
+  margin-bottom: 0.8em;
+}
+.mgnify-sourmash-component progress {
+  display: block;
+  min-width: 50vw;
+  height: 0.4em;
+}

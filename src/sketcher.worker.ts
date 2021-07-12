@@ -16,7 +16,7 @@ const smImport = import('sourmash').then(
   (Sourmash) => (KmerMinHash = Sourmash.KmerMinHash)
 );
 
-const isFASTA = (data: DataChunk) => data.toString().charAt(0) === '>';
+export const isFASTA = (data: DataChunk) => data.toString().charAt(0) === '>';
 
 function jsParse() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,6 +79,13 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
     .on('data', function (data: { seq: string }) {
       mh.add_sequence_js(data.seq);
     })
+    .on('error', (e: Error) => {
+      ctx.postMessage({
+        type: 'signature:error',
+        filename: file.name,
+        error: e.message,
+      });
+    })
     .on('end', function () {
       const jsonStr = mh.to_json();
       ctx.postMessage({
@@ -87,7 +94,11 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
         signature: jsonStr,
       });
     });
-  reader.pipe(seqparser);
+  try {
+    reader.pipe(seqparser);
+  } catch (e) {
+    console.log('AJA');
+  }
 }
 
 export default skecthFiles;
