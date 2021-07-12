@@ -18,12 +18,15 @@ export declare class MGnifySourmash extends LitElement {
     signatures: {
         [filename: string]: string;
     };
+    errors: {
+        [filename: string]: string;
+    };
+    static styles: any[];
     constructor();
     private haveCompletedAllSignatures;
     setChecked(event: MouseEvent): void;
     clear(): void;
-    static get styles(): import("lit").CSSResultGroup;
-    renderSelectedFiles(): import("lit-html").TemplateResult<1> | "";
+    renderSelectedFiles(): "" | import("lit-html").TemplateResult<1>;
     render(): import("lit-html").TemplateResult<1>;
     handleFileChanges(event: InputEvent): void;
 }
