@@ -87,18 +87,21 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
       });
     })
     .on('end', function () {
-      const jsonStr = mh.to_json();
+      const jsonStr = `[{
+        "class":"sourmash_signature","email":"",
+        "hash_function":"0.murmur64",
+        "filename":"${file.name}",
+        "license":"CC0",
+        "signatures":[${mh.to_json()}],
+        "version":0.4
+      }]`;
       ctx.postMessage({
         type: 'signature:generated',
         filename: file.name,
         signature: jsonStr,
       });
     });
-  try {
-    reader.pipe(seqparser);
-  } catch (e) {
-    console.log('AJA');
-  }
+  reader.pipe(seqparser);
 }
 
 export default skecthFiles;
