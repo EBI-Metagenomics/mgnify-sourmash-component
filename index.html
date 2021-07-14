@@ -2,7 +2,8 @@
         .getElementById('sourmash')
         .addEventListener('sketched', (evt) =>
           console.log(
-            `The signature for ${evt.detail.filename} has been created`
+            `The signature for ${evt.detail.filename} has been created`,
+            JSON.parse(evt.detail.signature)
           )
         );
       document
