@@ -80,8 +80,12 @@ div.mode-selector button.selected {
         <h2>Selected Files</h2>
         <ul>
           ${this.selectedFiles.map((t=>{var e;const i=(null===(e=this.progress)||void 0===e?void 0:e[t.name])||0,s=this.signatures[t.name],r=this.errors[t.name];let o=B``;return s&&(o=B`✅`),r&&(o=B`<span title=${r}>⚠️</span>`),B` <li>
-              ${o} ${t.name}
-              <progress id=${t.name} max="100" value=${i}>
+              ${t.name} ${o}
+              <progress
+                id=${t.name}
+                max="100"
+                value=${(t=>null!=t?t:F)(i>100?void 0:i)}
+              >
                 ${i.toFixed(2)}%
               </progress>
               ${this.show_signatures&&(null==s?void 0:s.length)?B`
