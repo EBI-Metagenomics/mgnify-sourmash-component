@@ -126,7 +126,7 @@ export class MGnifySourmash extends LitElement {
     if ((this.selectedFiles?.length || 0) < 1) return '';
     return html`
       <div>
-        <h2>Selected Files</h2>
+        <h2>Selected Files:</h2>
         <ul>
           ${this.selectedFiles.map((file: File) => {
             const progress = this.progress?.[file.name] || 0;
