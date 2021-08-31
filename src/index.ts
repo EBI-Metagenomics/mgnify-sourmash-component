@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property } from 'lit/decorators.js';
 
 import Worker from './sketcher.worker.ts';
@@ -135,8 +136,12 @@ export class MGnifySourmash extends LitElement {
             if (signature) emoji = html`✅`;
             if (error) emoji = html`<span title=${error}>⚠️</span>`;
             return html` <li>
-              ${emoji} ${file.name}
-              <progress id=${file.name} max="100" value=${progress}>
+              ${file.name} ${emoji}
+              <progress
+                id=${file.name}
+                max="100"
+                value=${ifDefined(progress > 100 ? undefined : progress)}
+              >
                 ${progress.toFixed(2)}%
               </progress>
               ${this.show_signatures && signature?.length
