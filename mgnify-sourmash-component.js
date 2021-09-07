@@ -79,7 +79,7 @@ div.mode-selector button.selected {
       <div>
         <h2>Selected Files:</h2>
         <ul>
-          ${this.selectedFiles.map((t=>{var e;const i=(null===(e=this.progress)||void 0===e?void 0:e[t.name])||0,s=this.signatures[t.name],r=this.errors[t.name];let o=B``;return s&&(o=B`✅`),r&&(o=B`<span title=${r}>⚠️</span>`),B` <li>
+          ${this.selectedFiles.map((t=>{var e;const i=(null===(e=this.progress)||void 0===e?void 0:e[t.name])||0,s=this.signatures[t.name],r=this.errors[t.name];let o=B``;return s&&(o=B`✅`),r&&(o=B`<span title=${r}>⚠️<code>${r}</code></span>`),B` <li>
               ${t.name} ${o}
               <progress
                 id=${t.name}
