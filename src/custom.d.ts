@@ -31,10 +31,6 @@ declare module 'filestream' {
 }
 
 type SwapFuntion = (_: any, x?: any) => any;
-declare module 'peek-stream' {
-  const x: (f: (data: any, swap: SwapFuntion) => any) => any;
-  export default x;
-}
 
 declare module 'fasta-parser' {
   import { Stream } from 'stream';

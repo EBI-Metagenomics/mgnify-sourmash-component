@@ -134,7 +134,8 @@ export class MGnifySourmash extends LitElement {
             const error = this.errors[file.name];
             let emoji = html``;
             if (signature) emoji = html`✅`;
-            if (error) emoji = html`<span title=${error}>⚠️</span>`;
+            if (error)
+              emoji = html`<span title=${error}>⚠️<code>${error}</code></span>`;
             return html` <li>
               ${file.name} ${emoji}
               <progress

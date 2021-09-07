@@ -5,7 +5,8 @@ import { read as FileReadStream } from 'filestream';
 // TODO: To be replaced by parsing the fasta from inside sourmash
 import Fasta from 'fasta-parser';
 
-import peek from 'peek-stream';
+// import peek from 'peek-stream';
+import peek from './peek-stream';
 import through from 'through2';
 import { obj as Pumpify } from 'pumpify';
 import { KmerMinHash as KmerMinHashType } from 'sourmash';
@@ -17,6 +18,9 @@ const smImport = import('sourmash').then(
 );
 
 export const isFASTA = (data: DataChunk) => data.toString().charAt(0) === '>';
+export const isDNASequence = (data: DataChunk) =>
+  (data.toString().split('\n')?.[1] || '').toUpperCase().match(/[^ATGCN]/) ===
+  null;
 
 function jsParse() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,11 +36,22 @@ function jsParse() {
   return stream;
 }
 
-function FASTParser() {
-  return peek(function (data: DataChunk, swap: SwapFuntion) {
-    if (isFASTA(data)) return swap(null, new Pumpify(Fasta(), jsParse()));
-    swap(new Error('No parser available'));
-  });
+function FASTParser(is_protein: boolean) {
+  return peek(
+    {
+      maxBuffer: 500,
+      newline: false,
+    },
+    function (data: DataChunk, swap: SwapFuntion) {
+      if (isFASTA(data)) {
+        if (!is_protein && !isDNASequence(data)) {
+          swap(new Error('Only DNA sequences supported'));
+        }
+        return swap(null, new Pumpify(Fasta(), jsParse()));
+      }
+      swap(new Error('No parser available'));
+    }
+  );
 }
 
 function skecthFiles(files: File[], options: KmerMinHashOptions) {
@@ -73,7 +88,7 @@ async function skecthFile(file: File, options: KmerMinHashOptions) {
     options.scaled,
     options.track_abundance
   );
-  const seqparser = FASTParser();
+  const seqparser = FASTParser(options.is_protein);
 
   seqparser
     .on('data', function (data: { seq: string }) {
