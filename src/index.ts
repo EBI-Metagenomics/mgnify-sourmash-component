@@ -165,7 +165,10 @@ export class MGnifySourmash extends LitElement {
       label = `${this.selectedFiles?.length} Files Selected`;
     return html`
       <div class="mgnify-sourmash-component">
-        <label>Select ${this.is_protein ? 'protein': 'nucleotides'} FastA files:</label>
+        <label
+          >Select ${this.is_protein ? 'protein' : 'nucleotides'} FastA
+          files:</label
+        >
         <label class="file" for="sourmash-selector">
           <input
             type="file"
