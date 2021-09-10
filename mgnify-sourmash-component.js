@@ -99,7 +99,10 @@ div.mode-selector button.selected {
       </div>
     `}render(){var t,e;let i=this.directory?"Choose a directory...":"Choose Files...";return(null===(t=this.selectedFiles)||void 0===t?void 0:t.length)&&(i=`${null===(e=this.selectedFiles)||void 0===e?void 0:e.length} Files Selected`),B`
       <div class="mgnify-sourmash-component">
-        <label>Select the FastA files:</label>
+        <label
+          >Select ${this.is_protein?"protein":"nucleotides"} FastA
+          files:</label
+        >
         <label class="file" for="sourmash-selector">
           <input
             type="file"
