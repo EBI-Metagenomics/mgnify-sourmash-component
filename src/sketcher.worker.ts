@@ -49,7 +49,7 @@ function FASTParser(is_protein: boolean) {
         }
         return swap(null, new Pumpify(Fasta(), jsParse()));
       }
-      swap(new Error('No parser available'));
+      swap(new Error('There was a problem parsing this file. It might be of an unsupported format.'));
     }
   );
 }
