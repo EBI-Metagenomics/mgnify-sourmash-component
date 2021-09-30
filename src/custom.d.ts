@@ -32,11 +32,11 @@ declare module 'filestream' {
 
 type SwapFuntion = (_: any, x?: any) => any;
 
-declare module 'fasta-parser' {
-  import { Stream } from 'stream';
-  const Fasta: () => Stream;
-  export default Fasta;
-}
+// declare module 'fasta-parser' {
+//   import { Stream } from 'stream';
+//   const Fasta: () => Stream;
+//   export default Fasta;
+// }
 
 declare module '*.worker.ts' {
   // You need to change `Worker`, if you specified a different value for the `workerType` option

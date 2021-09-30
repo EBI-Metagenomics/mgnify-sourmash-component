@@ -3,7 +3,7 @@ const ctx: Worker = self as any;
 
 import { read as FileReadStream } from 'filestream';
 // TODO: To be replaced by parsing the fasta from inside sourmash
-import Fasta from 'fasta-parser';
+import Fasta from './fasta-parser';
 
 // import peek from 'peek-stream';
 import peek from './peek-stream';
