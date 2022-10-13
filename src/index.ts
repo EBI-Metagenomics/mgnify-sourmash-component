@@ -8,7 +8,7 @@ import style from './index.css';
 
 const worker = new Worker();
 
-const SUPPORTED_EXTENSIONS = ['.fa', '.fasta'];
+const SUPPORTED_EXTENSIONS = ['.fa', '.fasta', '.fna'];
 @customElement('mgnify-sourmash-component')
 export class MGnifySourmash extends LitElement {
   @property({ type: Boolean, reflect: true })
