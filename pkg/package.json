@@ -1,0 +1,29 @@
+{
+  "name": "sourmash",
+  "collaborators": [
+    "Luiz Irber <luiz.irber@gmail.com>"
+  ],
+  "description": "MinHash sketches for genomic data",
+  "version": "0.13.0",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sourmash-bio/sourmash"
+  },
+  "files": [
+    "sourmash_bg.wasm",
+    "sourmash.js",
+    "sourmash_bg.js",
+    "sourmash.d.ts"
+  ],
+  "module": "sourmash.js",
+  "types": "sourmash.d.ts",
+  "sideEffects": [
+    "./sourmash.js",
+    "./snippets/*"
+  ],
+  "keywords": [
+    "minhash",
+    "bioinformatics"
+  ]
+}
