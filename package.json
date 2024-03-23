@@ -44,7 +44,7 @@
     "lit": "2.0.0-rc.2",
     "lit-css-loader": "1.0.1",
     "process": "0.11.10",
-    "sourmash": "file:./pkg",
+    "sourmash": "0.13.1",
     "util": "0.12.4",
     "worker-loader": "3.0.8"
   }
