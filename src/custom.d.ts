@@ -4,15 +4,6 @@ declare module '*.css' {
   export default content;
 }
 
-interface Read {
-  // eslint-disable-next-line  @typescript-eslint/no-misused-new
-  new (file: File): Read;
-  reader: {
-    onprogress: (data: any) => void;
-  };
-  pipe: (f: () => any) => any;
-}
-
 interface KmerMinHashOptions {
   num: number;
   ksize: number;
@@ -23,20 +14,6 @@ interface KmerMinHashOptions {
   scaled: number;
   track_abundance: boolean;
 }
-
-type DataChunk = Uint8Array | Uint16Array | Uint32Array;
-
-declare module 'filestream' {
-  export const read: Read;
-}
-
-type SwapFuntion = (_: any, x?: any) => any;
-
-// declare module 'fasta-parser' {
-//   import { Stream } from 'stream';
-//   const Fasta: () => Stream;
-//   export default Fasta;
-// }
 
 declare module '*.worker.ts' {
   // You need to change `Worker`, if you specified a different value for the `workerType` option

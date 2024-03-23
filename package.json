@@ -1,6 +1,6 @@
 {
   "name": "mgnify-sourmash-component",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A web component to select FastA file and generate sourmash signatures locally.",
   "module": "dist/mgnify-sourmash-component.js",
   "main": "dist/mgnify-sourmash-component.js",
@@ -24,8 +24,6 @@
   "author": "Gustavo A. Salazar",
   "license": "ISC",
   "devDependencies": {
-    "@types/pumpify": "1.4.1",
-    "@types/through2": "2.0.36",
     "@typescript-eslint/eslint-plugin": "4.31.0",
     "@typescript-eslint/parser": "4.31.0",
     "eslint": "7.32.0",
@@ -37,25 +35,16 @@
     "prettier": "2.4.0",
     "ts-loader": "9.2.5",
     "typescript": "4.4.2",
-    "webpack": "5.52.1",
+    "webpack": "^5.90.3",
     "webpack-cli": "4.8.0",
-    "webpack-dev-server": "4.2.0"
+    "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
     "bl": "5.0.0",
-    "buffer": "6.0.3",
-    "buffer-from": "1.1.2",
-    "duplexify": "4.1.2",
-    "fastqstream": "0.1.0",
-    "filestream": "5.0.0",
     "lit": "2.0.0-rc.2",
     "lit-css-loader": "1.0.1",
     "process": "0.11.10",
-    "pumpify": "2.0.1",
-    "sourmash": "0.11.0",
-    "split": "1.0.1",
-    "stream": "0.0.2",
-    "through2": "4.0.2",
+    "sourmash": "0.13.1",
     "util": "0.12.4",
     "worker-loader": "3.0.8"
   }
