@@ -166,7 +166,7 @@ export class MGnifySourmash extends LitElement {
     return html`
       <div class="mgnify-sourmash-component">
         <label
-          >Select ${this.is_protein ? 'protein' : 'nucleotides'} FastA
+          >Select ${this.is_protein ? 'protein' : 'nucleotides'} FASTA
           files:</label
         >
         <label class="file" for="sourmash-selector">
