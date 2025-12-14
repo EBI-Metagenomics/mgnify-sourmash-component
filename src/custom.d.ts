@@ -25,3 +25,10 @@ declare module '*.worker.ts' {
   // export = WebpackWorker;
   export default WebpackWorker;
 }
+
+declare module '*.wasm' {
+  const dataUrl: string;
+  export default dataUrl;
+}
+
+declare module 'sourmash/sourmash_bg.js';

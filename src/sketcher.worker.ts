@@ -1,27 +1,35 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import loadSourmash from "./sourmash-loader";
+
+console.log("[sourmash worker] booting");
 const ctx: Worker = self as any;
 
-import {
-  ComputeParameters as ComputeParametersType,
-  Signature as SignatureType,
-} from 'sourmash';
+let Signature: any = null;
+let ComputeParameters: any = null;
 
-// This needs to be a dynamic import to be able to use the wasm from inside sourmash
-let Signature: typeof SignatureType = null;
-let ComputeParameters: typeof ComputeParametersType = null;
-const smImport = import('sourmash').then((Sourmash) => {
-  Signature = Sourmash.Signature;
-  ComputeParameters = Sourmash.ComputeParameters;
-});
+let smReady: Promise<void> | null = null;
 
-function sketchFiles(files: File[], options: KmerMinHashOptions) {
+async function ensureSourmashReady() {
+  if (!smReady) {
+    smReady = (async () => {
+      const Sourmash: any = await loadSourmash();
+
+      Signature = Sourmash.Signature;
+      ComputeParameters = Sourmash.ComputeParameters;
+
+      console.log("[sourmash worker] ready", Object.keys(Sourmash));
+    })();
+  }
+  return smReady;
+}
+
+function sketchFiles(files: File[], options: any) {
   for (const file of files) {
     sketchFile(file, options);
   }
 }
 
-async function sketchFile(file: File, options: KmerMinHashOptions) {
-  await Promise.all([smImport]);
+async function sketchFile(file: File, options: any) {
+  await ensureSourmashReady();
 
   const params = new ComputeParameters();
   params.set_ksizes(new Uint32Array([options.ksize]));

@@ -1,59 +1,52 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
+// webpack.config.js
+const path = require("path");
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index.ts',
-  devtool: 'source-map',
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
-    port: 9001,
-    hot: true,
+  mode: "production",
+
+  entry: {
+    "mgnify-sourmash-component": "./src/index.ts",
   },
+
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    chunkFilename: "[name].js",
+    publicPath: "auto",
+    clean: true,
+  },
+
+
+  optimization: {
+    splitChunks: false,
+    runtimeChunk: false,
+    chunkIds: "named",
+    moduleIds: "deterministic",
+  },
+
+  experiments: {
+    asyncWebAssembly: true,
+  },
+  
   module: {
     rules: [
       {
-        test: /\.worker\.ts$/,
-        loader: 'worker-loader',
+        test: /\.wasm$/,
+        type: "asset/inline",
       },
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        loader: 'lit-css-loader',
-        options: {
-          import: 'lit', // defaults to lit-element
-        },
-      },
+      { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
+      { test: /\.css$/, loader: "lit-css-loader", options: { import: "lit" } },
     ],
   },
+
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+    extensions: [".tsx", ".ts", ".js"],
+    modules: [path.resolve(__dirname, "src"), "node_modules"],
+    mainFields: ["browser", "module", "main"],
   },
-  output: {
-    filename: 'mgnify-sourmash-component.js',
-    path: path.resolve(__dirname, 'dist'),
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'public', 'index.html'),
-      title: 'MGnify Sourmash Component - EBI',
-    }),
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-      process: 'process/browser',
-      util: 'util',
-      stream: 'stream',
-    }),
-  ],
-  experiments: {
-    syncWebAssembly: true,
+
+  stats: {
+    children: true,
+    errorDetails: true,
   },
 };

@@ -2,11 +2,15 @@ import { LitElement, html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property } from 'lit/decorators.js';
 
-import Worker from './sketcher.worker.ts';
+const worker = new Worker(
+  new URL(
+    /* webpackChunkName: "sketcher.worker" */ './sketcher.worker.ts',
+    import.meta.url
+  ),
+  { type: 'module' }
+);
 
 import style from './index.css';
-
-const worker = new Worker();
 
 const SUPPORTED_EXTENSIONS = ['.fa', '.fasta', '.fna', '.gz', '.fq', '.fastq'];
 @customElement('mgnify-sourmash-component')
