@@ -1,10 +1,14 @@
 {
   "name": "mgnify-sourmash-component",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "A web component to select FastA file and generate sourmash signatures locally.",
   "module": "dist/mgnify-sourmash-component.js",
   "main": "dist/mgnify-sourmash-component.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
   "scripts": {
     "build": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
@@ -44,8 +48,7 @@
     "lit": "2.0.0-rc.2",
     "lit-css-loader": "1.0.1",
     "process": "0.11.10",
-    "sourmash": "0.13.1",
-    "util": "0.12.4",
-    "worker-loader": "3.0.8"
+    "sourmash": "^0.19.0",
+    "util": "0.12.4"
   }
 }
