@@ -6,23 +6,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - name: Install and Build 🔧
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: "latest"
+
+      - name: Build sourmash wasm pkg
         run: |
-          npm ci
-      - name: Test 🧪
-        run: |
-          npm run eslint
-      - name: Build Component 🏗
+          cd sourmash/src/core
+          wasm-pack build --target web --release
+          ls -la pkg
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Lint
+        run: npm run eslint
+
+      - name: Build Component
         run: |
           npm run build
           ls -l dist
+
       - name: Deploy Site 🚀
         if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: dist # The folder the action should deploy.
-          CLEAN: true # Automatically remove deleted files from the deploy branch
+          BRANCH: gh-pages
+          FOLDER: dist
+          CLEAN: true
