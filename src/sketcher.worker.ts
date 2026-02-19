@@ -4,7 +4,7 @@ const ctx: Worker = self as any;
 import {
   ComputeParameters as ComputeParametersType,
   Signature as SignatureType,
-} from 'sourmash';
+} from '../sourmash/src/core/pkg/sourmash';
 
 // This needs to be a dynamic import to be able to use the wasm from inside sourmash
 let Signature: typeof SignatureType = null;

@@ -22,7 +22,7 @@ export class MGnifySourmash extends LitElement {
   @property({ type: Number })
   num = 0;
   @property({ type: Number })
-  ksize = 31;
+  ksize = 21;
   @property({ type: Boolean })
   is_protein = false;
   @property({ type: Boolean })
