@@ -1,0 +1,3 @@
+[submodule "sourmash"]
+	path = sourmash
+	url = https://github.com/EBI-Metagenomics/sourmash.git
