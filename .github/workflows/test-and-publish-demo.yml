@@ -40,6 +40,13 @@ jobs:
           npm run build
           ls -l dist
 
+      - name: Publish to npm
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish --access public
+
       - name: Deploy Site 🚀
         if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@3.7.1
@@ -48,3 +55,5 @@ jobs:
           BRANCH: gh-pages
           FOLDER: dist
           CLEAN: true
+
+
