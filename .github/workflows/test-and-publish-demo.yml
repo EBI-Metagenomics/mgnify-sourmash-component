@@ -42,10 +42,10 @@ jobs:
 
       - name: Publish to npm
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.MGNIFY_SOURMASH_COMPONENT_NPM_PUSH_TOKEN }}
-        run: |
-          npm publish --access public
 
       - name: Deploy Site 🚀
         if: github.ref == 'refs/heads/main'
