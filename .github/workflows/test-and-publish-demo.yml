@@ -2,6 +2,10 @@ name: Test and Publish the Demo
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,6 +21,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          registry-url: https://registry.npmjs.org
 
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
@@ -42,10 +47,7 @@ jobs:
 
       - name: Publish to npm
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.MGNIFY_SOURMASH_COMPONENT_NPM_PUSH_TOKEN }}
+        run: npm publish --provenance --access public
 
       - name: Deploy Site 🚀
         if: github.ref == 'refs/heads/main'
@@ -55,5 +57,3 @@ jobs:
           BRANCH: gh-pages
           FOLDER: dist
           CLEAN: true
-
-
