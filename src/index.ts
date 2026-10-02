@@ -8,7 +8,8 @@ import style from './index.css';
 
 const worker = new Worker();
 
-const SUPPORTED_EXTENSIONS = ['.fa', '.fasta', '.fna', '.gz', '.fq', '.fastq'];
+const SEQUENCE_EXTENSIONS = ['.fa', '.fasta', '.fna', '.gz', '.fq', '.fastq'];
+const SIGNATURE_EXTENSION = '.sig';
 @customElement('mgnify-sourmash-component')
 export class MGnifySourmash extends LitElement {
   @property({ type: Boolean, reflect: true })
@@ -17,6 +18,8 @@ export class MGnifySourmash extends LitElement {
   show_directory_checkbox = false;
   @property({ type: Boolean })
   show_signatures = false;
+  @property({ type: Boolean, attribute: 'accept-sigs' })
+  acceptSigs = false;
 
   // KmerMinHash parameters
   @property({ type: Number })
@@ -58,42 +61,10 @@ export class MGnifySourmash extends LitElement {
           this.requestUpdate();
           break;
         case 'signature:error':
-          this.errors[event.data.filename] = event.data.error;
-          this.dispatchEvent(
-            new CustomEvent('sketchedError', {
-              bubbles: true,
-              detail: {
-                filename: event.data.filename,
-                error: event.data.error,
-              },
-            })
-          );
-          this.requestUpdate();
+          this.recordSignatureError(event.data.filename, event.data.error);
           break;
         case 'signature:generated':
-          this.signatures[event.data.filename] = event.data.signature;
-          this.progress[event.data.filename] = 100;
-          this.dispatchEvent(
-            new CustomEvent('sketched', {
-              bubbles: true,
-              detail: {
-                filename: event.data.filename,
-                signature: event.data.signature,
-              },
-            })
-          );
-          if (this.haveCompletedAllSignatures()) {
-            this.dispatchEvent(
-              new CustomEvent('sketchedall', {
-                bubbles: true,
-                detail: {
-                  signatures: this.signatures,
-                  errors: this.errors,
-                },
-              })
-            );
-          }
-          this.requestUpdate();
+          this.recordSignature(event.data.filename, event.data.signature);
           break;
         default:
           break;
@@ -105,6 +76,71 @@ export class MGnifySourmash extends LitElement {
     return Object.keys(this.progress).every(
       (key: string) => key in this.signatures || key in this.errors
     );
+  }
+
+  private dispatchCompletedIfReady() {
+    if (!this.haveCompletedAllSignatures()) return;
+
+    this.dispatchEvent(
+      new CustomEvent('sketchedall', {
+        bubbles: true,
+        detail: {
+          signatures: this.signatures,
+          errors: this.errors,
+        },
+      })
+    );
+  }
+
+  private recordSignature(filename: string, signature: string) {
+    this.signatures[filename] = signature;
+    this.progress[filename] = 100;
+    this.dispatchEvent(
+      new CustomEvent('sketched', {
+        bubbles: true,
+        detail: { filename, signature },
+      })
+    );
+    this.dispatchCompletedIfReady();
+    this.requestUpdate();
+  }
+
+  private recordSignatureError(filename: string, error: string) {
+    this.errors[filename] = error;
+    this.dispatchEvent(
+      new CustomEvent('sketchedError', {
+        bubbles: true,
+        detail: { filename, error },
+      })
+    );
+    this.dispatchCompletedIfReady();
+    this.requestUpdate();
+  }
+
+  private isSignatureFile(file: File) {
+    return file.name.toLowerCase().endsWith(SIGNATURE_EXTENSION);
+  }
+
+  private acceptsFile(file: File) {
+    const filename = file.name.toLowerCase();
+    return (
+      SEQUENCE_EXTENSIONS.some((extension) => filename.endsWith(extension)) ||
+      (this.acceptSigs && this.isSignatureFile(file))
+    );
+  }
+
+  private async loadSignatureFile(file: File) {
+    try {
+      // Pass uploaded signatures through unchanged as text. Normalisation and
+      // backend-specific validation belong to the consuming client.
+      const signature = await file.text();
+      this.recordSignature(file.name, signature);
+    } catch (error) {
+      this.recordSignatureError(
+        file.name,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
   }
 
   setChecked(event: MouseEvent) {
@@ -163,18 +199,21 @@ export class MGnifySourmash extends LitElement {
     let label = this.directory ? 'Choose a directory...' : 'Choose Files...';
     if (this.selectedFiles?.length)
       label = `${this.selectedFiles?.length} Files Selected`;
+    const acceptedExtensions = this.acceptSigs
+      ? [...SEQUENCE_EXTENSIONS, SIGNATURE_EXTENSION]
+      : SEQUENCE_EXTENSIONS;
     return html`
       <div class="mgnify-sourmash-component">
-        <label
-          >Select ${this.is_protein ? 'protein' : 'nucleotides'} FASTA
-          files:</label
-        >
+        <label>
+          Select ${this.is_protein ? 'protein' : 'nucleotides'} FASTA
+          files${this.acceptSigs ? ' or Sourmash signatures' : ''}:
+        </label>
         <label class="file" for="sourmash-selector">
           <input
             type="file"
             id="sourmash-selector"
             name="sourmash-selector"
-            accept=${SUPPORTED_EXTENSIONS.join(',')}
+            accept=${acceptedExtensions.join(',')}
             @change=${this.handleFileChanges}
             ?webkitdirectory=${this.directory}
             ?multiple=${!this.directory}
@@ -208,28 +247,36 @@ export class MGnifySourmash extends LitElement {
     event.preventDefault();
     this.selectedFiles = Array.from(
       (event.currentTarget as HTMLInputElement).files
-    ).filter((file: File) => {
-      for (const ext of SUPPORTED_EXTENSIONS) {
-        if (file.name.endsWith(ext)) {
-          return true;
-        }
-      }
-      return false;
-    });
+    ).filter((file: File) => this.acceptsFile(file));
 
-    worker.postMessage({
-      files: this.selectedFiles,
-      options: {
-        num: this.num,
-        ksize: this.ksize,
-        is_protein: this.is_protein,
-        dayhoff: this.dayhoff,
-        hp: this.hp,
-        seed: this.seed,
-        scaled: this.scaled,
-        track_abundance: this.track_abundance,
-      },
-    });
+    this.progress = Object.fromEntries(
+      this.selectedFiles.map((file: File) => [file.name, 0])
+    );
+    this.signatures = {};
+    this.errors = {};
+
+    const signatureFiles = this.selectedFiles.filter((file: File) =>
+      this.isSignatureFile(file)
+    );
+    const sequenceFiles = this.selectedFiles.filter(
+      (file: File) => !this.isSignatureFile(file)
+    );
+
+    if (sequenceFiles.length) {
+      worker.postMessage({
+        files: sequenceFiles,
+        options: {
+          num: this.num,
+          ksize: this.ksize,
+          is_protein: this.is_protein,
+          dayhoff: this.dayhoff,
+          hp: this.hp,
+          seed: this.seed,
+          scaled: this.scaled,
+          track_abundance: this.track_abundance,
+        },
+      });
+    }
     this.dispatchEvent(
       new CustomEvent('change', {
         bubbles: true,
@@ -238,6 +285,8 @@ export class MGnifySourmash extends LitElement {
         },
       })
     );
+
+    signatureFiles.forEach((file: File) => this.loadSignatureFile(file));
 
     this.requestUpdate();
   }
