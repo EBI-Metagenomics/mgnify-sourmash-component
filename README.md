@@ -51,6 +51,13 @@ Displays or not a checkbox to select the mode(`directory`) of the file chooser
 
 Displays or not the signatures once they are calculated.
 
+##### `accept-sigs: boolean = false`
+
+Allows existing, uncompressed Sourmash `.sig` files to be selected. Signature
+files are read and emitted unchanged through the `sketched` and `sketchedall`
+events; they are not sent through the sequence sketcher. Validation and request
+normalisation are the responsibility of the consuming application.
+
 #### KmerMinHash Options
 
 ##### `num: number = 0`
@@ -105,7 +112,8 @@ The `signatures` property is an object where the key are the filenames of the se
 
 ##### `sketched`
 
-The `sketched` event is fired when a single file read is completed and a signature for has been calculated.
+The `sketched` event is fired when a single sequence file has been sketched or
+an existing `.sig` file has been read.
 
 | Bubbles    | Yes |
 | ---------- | --- |
@@ -120,7 +128,7 @@ detail: {
 
 ##### `sketchedall`
 
-The `sketchedall` event is fired when all the requested files have been read and proccessed.
+The `sketchedall` event is fired when all the requested files have been read and processed.
 If a signature couldn't be generated, its value in the returned object will be `null`.
 
 | Bubbles    | Yes |
